@@ -1,0 +1,8 @@
+{
+  "name": "bitbank-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "ssh://git@github.com/96-38/bitbank-api.git",
+  "author": "<b1919367@planet.kanazawa-it.ac.jp>",
+  "license": "MIT"
+}
