@@ -4,5 +4,10 @@
   "main": "index.js",
   "repository": "ssh://git@github.com/96-38/bitbank-api.git",
   "author": "<b1919367@planet.kanazawa-it.ac.jp>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.5"
+  }
 }
