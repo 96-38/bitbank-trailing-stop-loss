@@ -82,7 +82,7 @@ const checkLimit = async () => {
     console.log({ currentPrice: currentPrice.data.last });
     const orderedPrice = orderConfig.price!;
     console.log({ orderedPrice });
-    console.log(`{ max: ${temp} }`);
+    console.log(`{ ↑: ${temp} }`);
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
     console.log({ limitPrice: limit.price });
