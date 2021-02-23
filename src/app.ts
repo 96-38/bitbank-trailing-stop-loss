@@ -17,6 +17,7 @@ const setAmount = async (jpy: number) => {
   const price = await publicApi.getTicker(mona);
   amount = String(jpy / Number(price.data.last));
   orderConfig.amount = amount;
+  orderPayoff.amount = amount;
   console.log(`set amount:${orderConfig.amount}`);
 };
 
@@ -29,6 +30,12 @@ const orderConfig: bitbank.OrderRequest = {
   type: 'limit', // required
 };
 
+const orderPayoff: bitbank.OrderRequest = {
+  pair: 'mona_jpy', // required
+  amount: amount, // required
+  side: 'sell', // required
+  type: 'market', // required
+};
 //initialize limit
 const limit = {
   price: 0,
@@ -39,6 +46,13 @@ const limit = {
 //指値注文を発注
 const postOrder = async () => {
   const res = await privateApi.postOrder(orderConfig);
+  console.log(res);
+};
+
+//成り売り
+const payoff = async () => {
+  const res = await privateApi.postOrder(orderPayoff);
+  console.log(res);
 };
 
 // 注文価格を最終約定価格に設定
@@ -82,17 +96,19 @@ const checkLimit = async () => {
       //現在価格が損切りラインを下回った時に実行
       console.log('clear');
       clearInterval(id);
+      payoff();
     }
     counter++;
   }, 1500);
 };
 
 const main = async () => {
+  //JPY換算で注文数量を引数に指定
   await setAmount(100);
   await setPrice();
   await setInitialLimit();
+  await postOrder();
   await checkLimit();
-  // await postOrder();
 };
 
 main();
