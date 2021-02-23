@@ -43,18 +43,6 @@ const limit = {
 
 //---------- functions ----------
 
-//指値注文を発注
-const postOrder = async () => {
-  const res = await privateApi.postOrder(orderConfig);
-  console.log(res);
-};
-
-//成り売り
-const payoff = async () => {
-  const res = await privateApi.postOrder(orderPayoff);
-  console.log(res);
-};
-
 // 注文価格を最終約定価格に設定
 const setPrice = async () => {
   const price = await publicApi.getTicker(mona);
@@ -103,7 +91,6 @@ const checkLimit = async () => {
       //現在価格が損切りラインを下回った時のみ実行
       console.log('clear');
       clearInterval(id);
-      payoff();
     }
     counter++;
   }, interval);
@@ -111,10 +98,9 @@ const checkLimit = async () => {
 
 const main = async () => {
   //JPY換算で注文数量を引数に指定
-  await setAmount(100);
+  await setAmount(10000);
   await setPrice();
   await setInitialLimit();
-  await postOrder();
   await checkLimit();
 };
 
