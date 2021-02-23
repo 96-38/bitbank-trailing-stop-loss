@@ -17,6 +17,7 @@ const setAmount = async (jpy: number) => {
   const price = await publicApi.getTicker(mona);
   amount = String(jpy / Number(price.data.last));
   orderConfig.amount = amount;
+  console.log(`set amount:${orderConfig.amount}`);
 };
 
 //order params
@@ -34,36 +35,40 @@ const limit = {
 };
 
 //---------- functions ----------
+
+//指値注文を発注
 const postOrder = async () => {
   const res = await privateApi.postOrder(orderConfig);
-  // console.log(res);
 };
 
+// 注文価格を最終約定価格に設定
 const setPrice = async () => {
   const price = await publicApi.getTicker(mona);
   orderConfig.price = Number(price.data.last);
-  // console.log(orderConfig);
+  console.log(`set price: ${orderConfig.price}`);
 };
 
+// 最終約定価格 * 0.98 に損切りラインを設定
 const setInitialLimit = async () => {
   const price = await publicApi.getTicker(mona);
-  //最終約定価格 * 0.98 に損切りラインを設定
   limit.price = Number(price.data.last) * 0.98;
-  console.log(`set initial limit : ${limit.price}`);
+  console.log(`set initial limit: ${limit.price}`);
 };
 
 const checkLimit = async () => {
-  let conter = 0;
-  //注文価格を変数に保存
-  //最新の価格の一つ前の価格を保存するための一時変数
+  let counter = 1;
+  // 最新の価格の一つ前の価格を保存するための一時変数
   let temp = orderConfig.price!;
+  console.log('starting trail ...');
+  // 1500ms ごとに実行
   const id = setInterval(async () => {
+    console.log(`===== ${counter} =====`);
     //現在価格を取得
     const currentPrice = await publicApi.getTicker(mona);
     console.log({ currentPrice: currentPrice.data.last });
     const orderedPrice = orderConfig.price!;
     console.log({ orderedPrice });
-    console.log({ temp });
+    console.log(`{ max: ${temp} }`);
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
     console.log({ limitPrice: limit.price });
@@ -78,16 +83,15 @@ const checkLimit = async () => {
       console.log('clear');
       clearInterval(id);
     }
-    console.log(conter++);
+    counter++;
   }, 1500);
 };
 
 const main = async () => {
   await setAmount(100);
-  await console.log(`orederAmount:${orderConfig.amount}`);
   await setPrice();
   await setInitialLimit();
-  // await checkLimit();
+  await checkLimit();
   // await postOrder();
 };
 
