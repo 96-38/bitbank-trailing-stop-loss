@@ -73,6 +73,7 @@ const checkLimit = async () => {
     const currentPrice = await publicApi.getTicker(mona);
     console.log({ currentPrice: Number(currentPrice.data.last) });
     console.log({ highestPrice: temp });
+    //変動幅算出
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
     console.log({ limitPrice: limit.price });
