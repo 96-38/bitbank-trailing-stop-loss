@@ -1,5 +1,6 @@
 import * as bitbank from 'node-bitbankcc';
 import { confPri, confPub } from './config';
+import dayjs from 'dayjs';
 
 // instance
 const privateApi = new bitbank.PrivateApi(confPri);
@@ -73,18 +74,29 @@ const setInitialLimit = async () => {
 const checkLimit = async () => {
   let counter = 1;
   const interval = 1500;
+  //開始時刻
+  const startTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
   // 最新の価格の一つ前の価格を保存するための一時変数
   let temp = orderConfig.price!;
   console.log('starting trail ...');
   // 1500ms ごとに実行
   const id = setInterval(async () => {
-    console.log(`========== time: ${counter * (interval / 1000)} s ==========`);
-    //現在価格を取得
+    //現在時刻
+    const currentTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
+    console.log(
+      `========== time: ${dayjs(currentTime).diff(
+        startTime,
+        'second'
+      )} s ==========`
+    );
+    console.log({ currentTime });
+    //注文価格を取得
     const orderedPrice = orderConfig.price!;
     console.log({ orderedPrice });
     const currentPrice = await publicApi.getTicker(mona);
     console.log({ currentPrice: Number(currentPrice.data.last) });
     console.log({ highestPrice: temp });
+    //変動幅算出
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
     console.log({ limitPrice: limit.price });
@@ -92,7 +104,8 @@ const checkLimit = async () => {
     const profit =
       Number(orderConfig.amount) * limit.price -
       Number(orderConfig.amount) * orderConfig.price!;
-    console.log(`{ profit: ${profit} yen}`);
+    console.log(`{ estimated profit: ${profit} yen}`);
+    console.log();
     if (diff > 0) {
       //現在価格が上昇した時のみ実行
       temp += diff;
@@ -101,7 +114,7 @@ const checkLimit = async () => {
     }
     if (Number(currentPrice.data.last) <= limit.price) {
       //現在価格が損切りラインを下回った時のみ実行
-      console.log('clear');
+      console.log('done');
       clearInterval(id);
       payoff();
     }
@@ -111,7 +124,7 @@ const checkLimit = async () => {
 
 const main = async () => {
   //JPY換算で注文数量を引数に指定
-  await setAmount(100);
+  await setAmount(10000);
   await setPrice();
   await setInitialLimit();
   await postOrder();
