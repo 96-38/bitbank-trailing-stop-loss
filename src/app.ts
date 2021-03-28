@@ -44,6 +44,13 @@ const limit = {
 };
 
 //---------- functions ----------
+//JPY資産を取得
+const getAssets = async () => {
+  const res = await privateApi.getAssets();
+  //return JPY amount
+  return Number(res.data.assets[0].onhand_amount);
+};
+
 //指値注文を発注
 const postOrder = async () => {
   const res = await privateApi.postOrder(buyConfig);
@@ -61,12 +68,12 @@ const getOrderInfo = async (config: { order_id: number; pair: string }) => {
   return res;
 };
 
-//約定を判定して完了するまで待機
-const checkOrderStatus = (
+//約定を判定して完了するまで待機 → トレーリングストップ処理を開始
+const checkOrderStatus = async (
   config: { order_id: number; pair: string },
   callback: () => Promise<void>
 ) => {
-  const id = setInterval(async () => {
+  const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
     if (status.data.status !== 'FULLY_FILLED') {
       console.log('waiting for transaction ...');
@@ -153,11 +160,16 @@ const checkLimit = async () => {
 
 const main = async () => {
   //JPY換算で注文数量を引数に指定
+  // const before = await getAssets();
   await setAmount(100);
   await setPrice();
   await setInitialLimit();
   const config = await postOrder();
   await checkOrderStatus(config, checkLimit);
+  // const after = await getAssets();
+  // const profit = (await after) - before;
+  // console.log({ profit });
+  // console.log({ before, after });
 };
 
 main();
