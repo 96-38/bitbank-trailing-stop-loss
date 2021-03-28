@@ -12,18 +12,18 @@ const mona: bitbank.GetTickerRequest = {
   pair: 'mona_jpy', // required
 };
 
-//order amount
+//set order amount
 let amount = ''; // initialize
 const setAmount = async (jpy: number) => {
   const price = await publicApi.getTicker(mona);
   amount = String(jpy / Number(price.data.last));
-  orderConfig.amount = amount;
-  orderPayoff.amount = amount;
-  console.log(`set amount:${orderConfig.amount}`);
+  buyConfig.amount = amount;
+  sellConfig.amount = amount;
+  console.log(`set amount:${buyConfig.amount}`);
 };
 
 //order params
-const orderConfig: bitbank.OrderRequest = {
+const buyConfig: bitbank.OrderRequest = {
   pair: 'mona_jpy', // required
   amount: amount, // required
   price: 0, // optional
@@ -31,36 +31,64 @@ const orderConfig: bitbank.OrderRequest = {
   type: 'limit', // required
 };
 
-const orderPayoff: bitbank.OrderRequest = {
+const sellConfig: bitbank.OrderRequest = {
   pair: 'mona_jpy', // required
   amount: amount, // required
   side: 'sell', // required
   type: 'market', // required
 };
+
 //initialize limit
 const limit = {
   price: 0,
 };
 
 //---------- functions ----------
-
 //指値注文を発注
 const postOrder = async () => {
-  const res = await privateApi.postOrder(orderConfig);
-  console.log(res);
+  const res = await privateApi.postOrder(buyConfig);
+  //注文情報を参照する際に必要なオブジェクトを return
+  const orderInfo: bitbank.GetOrderRequest = {
+    order_id: res.data.order_id,
+    pair: 'mona_jpy',
+  };
+  return orderInfo;
+};
+
+//注文情報を取得
+const getOrderInfo = async (config: { order_id: number; pair: string }) => {
+  const res = await privateApi.getOrder(config);
+  return res;
+};
+
+//約定を判定して完了するまで待機
+const checkOrderStatus = (
+  config: { order_id: number; pair: string },
+  callback: () => Promise<void>
+) => {
+  const id = setInterval(async () => {
+    const status = await getOrderInfo(config);
+    if (status.data.status !== 'FULLY_FILLED') {
+      console.log('waiting for transaction ...');
+    } else if (status.data.status === 'FULLY_FILLED') {
+      console.log('transaction completed');
+      clearInterval(id);
+      await callback();
+    }
+  }, 1000);
 };
 
 //成り売り
 const payoff = async () => {
-  const res = await privateApi.postOrder(orderPayoff);
+  const res = await privateApi.postOrder(sellConfig);
   console.log(res);
 };
 
 // 注文価格を最終約定価格に設定
 const setPrice = async () => {
   const price = await publicApi.getTicker(mona);
-  orderConfig.price = Number(price.data.last);
-  console.log(`set price: ${orderConfig.price}`);
+  buyConfig.price = Number(price.data.last);
+  console.log(`set price: ${buyConfig.price}`);
 };
 
 // 最終約定価格 * 0.98 に損切りラインを設定
@@ -76,8 +104,8 @@ const checkLimit = async () => {
   const interval = 1500;
   //開始時刻
   const startTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
-  // 最新の価格の一つ前の価格を保存するための一時変数
-  let temp = orderConfig.price!;
+  // 価格の状態を保存するための変数
+  let temp = buyConfig.price!;
   console.log('starting trail ...');
   // 1500ms ごとに実行
   const id = setInterval(async () => {
@@ -91,10 +119,11 @@ const checkLimit = async () => {
     );
     console.log({ currentTime });
     //注文価格を取得
-    const orderedPrice = orderConfig.price!;
+    const orderedPrice = buyConfig.price!;
     console.log({ orderedPrice });
     const currentPrice = await publicApi.getTicker(mona);
     console.log({ currentPrice: Number(currentPrice.data.last) });
+    //追従開始から現在までの最高値
     console.log({ highestPrice: temp });
     //変動幅算出
     const diff = Number(currentPrice.data.last) - temp;
@@ -102,8 +131,8 @@ const checkLimit = async () => {
     console.log({ limitPrice: limit.price });
     //利益算出
     const profit =
-      Number(orderConfig.amount) * limit.price -
-      Number(orderConfig.amount) * orderConfig.price!;
+      Number(buyConfig.amount) * limit.price -
+      Number(buyConfig.amount) * buyConfig.price!;
     console.log(`{ estimated profit: ${profit} yen}`);
     console.log();
     if (diff > 0) {
@@ -124,11 +153,11 @@ const checkLimit = async () => {
 
 const main = async () => {
   //JPY換算で注文数量を引数に指定
-  await setAmount(10000);
+  await setAmount(100);
   await setPrice();
   await setInitialLimit();
-  await postOrder();
-  await checkLimit();
+  const config = await postOrder();
+  await checkOrderStatus(config, checkLimit);
 };
 
 main();
