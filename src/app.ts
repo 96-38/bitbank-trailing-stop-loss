@@ -39,8 +39,8 @@ const sellConfig: bitbank.OrderRequest = {
   type: 'market', // required
 };
 
-//initialize limit
-const limit = {
+//initialize Stop
+const stop = {
   price: 0,
 };
 
@@ -103,8 +103,8 @@ const setPrice = async () => {
 // 最終約定価格 * 0.98 に損切りラインを設定
 const setInitialStop = async () => {
   const price = await publicApi.getTicker(mona);
-  limit.price = Number(price.data.last) * 0.98;
-  console.log(`initial stop: ${limit.price}`);
+  stop.price = Number(price.data.last) * 0.98;
+  console.log(`stop price: ${stop.price}`);
 };
 
 // 一定時間毎に現在価格が損切りラインに達していないか判定
@@ -137,20 +137,20 @@ const checkStop = async () => {
     //変動幅算出
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
-    console.log({ limitPrice: limit.price });
+    console.log({ stopPrice: stop.price });
     //利益算出
     const profit =
-      Number(buyConfig.amount) * limit.price -
+      Number(buyConfig.amount) * stop.price -
       Number(buyConfig.amount) * buyConfig.price!;
     console.log(`{ estimated profit: ${profit} yen}`);
     console.log();
     if (diff > 0) {
       //現在価格が上昇した時のみ実行
       temp += diff;
-      limit.price += diff;
-      console.log(`set limit : ${limit.price}`);
+      stop.price += diff;
+      console.log(`set stop : ${stop.price}`);
     }
-    if (Number(currentPrice.data.last) <= limit.price) {
+    if (Number(currentPrice.data.last) <= stop.price) {
       //現在価格が損切りラインを下回った時のみ実行
       console.log('done');
       clearInterval(id);
