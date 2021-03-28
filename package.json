@@ -17,6 +17,7 @@
   "dependencies": {
     "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
-    "node-bitbankcc": "^2.1.2"
+    "node-bitbankcc": "^2.1.2",
+    "ora": "^5.4.0"
   }
 }

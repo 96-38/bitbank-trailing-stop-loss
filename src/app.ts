@@ -1,6 +1,7 @@
 import * as bitbank from 'node-bitbankcc';
 import { confPri, confPub } from './config';
 import dayjs from 'dayjs';
+import ora from 'ora';
 
 // instance
 const privateApi = new bitbank.PrivateApi(confPri);
@@ -19,7 +20,7 @@ const setAmount = async (jpy: number) => {
   amount = String(jpy / Number(price.data.last));
   buyConfig.amount = amount;
   sellConfig.amount = amount;
-  console.log(`set amount:${buyConfig.amount}`);
+  console.log(`order amount: ${buyConfig.amount}`);
 };
 
 //order params
@@ -73,16 +74,17 @@ const checkOrderStatus = async (
   config: { order_id: number; pair: string },
   callback: () => Promise<void>
 ) => {
+  const spinner = ora('waiting for transaction');
+  spinner.start();
   const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
-    if (status.data.status !== 'FULLY_FILLED') {
-      console.log('waiting for transaction ...');
-    } else if (status.data.status === 'FULLY_FILLED') {
-      console.log('transaction completed');
+    if (status.data.status === 'FULLY_FILLED') {
+      // console.log('\ntransaction completed');
+      spinner.succeed('transaction completed');
       clearInterval(id);
       await callback();
     }
-  }, 1000);
+  }, 1500);
 };
 
 //成り売り
@@ -95,18 +97,18 @@ const payoff = async () => {
 const setPrice = async () => {
   const price = await publicApi.getTicker(mona);
   buyConfig.price = Number(price.data.last);
-  console.log(`set price: ${buyConfig.price}`);
+  console.log(`order price: ${buyConfig.price}`);
 };
 
 // 最終約定価格 * 0.98 に損切りラインを設定
-const setInitialLimit = async () => {
+const setInitialStop = async () => {
   const price = await publicApi.getTicker(mona);
   limit.price = Number(price.data.last) * 0.98;
-  console.log(`set initial limit: ${limit.price}`);
+  console.log(`initial stop: ${limit.price}`);
 };
 
 // 一定時間毎に現在価格が損切りラインに達していないか判定
-const checkLimit = async () => {
+const checkStop = async () => {
   let counter = 1;
   const interval = 1500;
   //開始時刻
@@ -163,9 +165,9 @@ const main = async () => {
   // const before = await getAssets();
   await setAmount(100);
   await setPrice();
-  await setInitialLimit();
+  await setInitialStop();
   const config = await postOrder();
-  await checkOrderStatus(config, checkLimit);
+  await checkOrderStatus(config, checkStop);
   // const after = await getAssets();
   // const profit = (await after) - before;
   // console.log({ profit });
