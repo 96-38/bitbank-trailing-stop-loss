@@ -79,7 +79,6 @@ const checkOrderStatus = async (
   const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
     if (status.data.status === 'FULLY_FILLED') {
-      // console.log('\ntransaction completed');
       spinner.succeed('transaction completed');
       clearInterval(id);
       await callback();
