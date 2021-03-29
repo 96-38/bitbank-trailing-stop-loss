@@ -76,8 +76,15 @@ const checkOrderStatus = async (
 ) => {
   const spinner = ora('waiting for transaction');
   spinner.start();
+  let counter = 0;
   const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
+    counter++;
+    if (counter > 20) {
+      spinner.fail('transaction timeout : order cancelled');
+      await privateApi.cancelOrder(config);
+      clearInterval(id);
+    }
     if (status.data.status === 'FULLY_FILLED') {
       spinner.succeed('transaction completed');
       clearInterval(id);
@@ -163,7 +170,7 @@ const main = async () => {
   //JPY換算で注文数量を引数に指定
   // const before = await getAssets();
   await setAmount(100);
-  await setPrice();
+  await setPrice(220);
   await setInitialStop();
   const config = await postOrder();
   await checkOrderStatus(config, checkStop);
