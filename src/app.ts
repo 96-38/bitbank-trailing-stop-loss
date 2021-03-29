@@ -56,7 +56,7 @@ const getOrderInfo = async (config: { order_id: number; pair: string }) => {
 //waiting for transaction -> start trailing
 const checkOrderStatus = async (
   timeout: number = 30,
-  config: { order_id: number; pair: string },
+  orderInfo: { order_id: number; pair: string },
   callback: () => Promise<void>
 ) => {
   //counter for timeout
@@ -65,12 +65,12 @@ const checkOrderStatus = async (
   const spinner = ora(`waiting for transaction: timeout ${timeout} sec`);
   spinner.start();
   const id = await setInterval(async () => {
-    const status = await getOrderInfo(config);
+    const status = await getOrderInfo(orderInfo);
     counter++;
     //timeout, cancel order
     if (counter > maxCount) {
       spinner.fail('transaction timeout: order cancelled');
-      await privateApi.cancelOrder(config);
+      await privateApi.cancelOrder(orderInfo);
       clearInterval(id);
     }
     //when transaction completed
@@ -156,8 +156,8 @@ const main = async () => {
   await setAmount(userConfig.amount);
   await setPrice(userConfig.price);
   await setInitialStop();
-  const config = await postOrder();
-  await checkOrderStatus(userConfig.timeout, config, checkStop);
+  const orderInfo = await postOrder();
+  await checkOrderStatus(userConfig.timeout, orderInfo, checkStop);
   // const after = await getAssets();
   // const profit = (await after) - before;
   // console.log({ profit });
