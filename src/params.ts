@@ -46,11 +46,3 @@ export const stop = {
   price: 0,
 };
 
-export const userConfig = {
-  //timeout sec (default: 30sec)
-  timeout: 5,
-  //manual pricing (default: last price)
-  price: 200,
-  //set amount(JPY)
-  amount: 10,
-};

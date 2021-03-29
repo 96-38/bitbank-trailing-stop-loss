@@ -1,13 +1,6 @@
 import * as bitbank from 'node-bitbankcc';
-import {
-  confPri,
-  confPub,
-  pair,
-  buyConfig,
-  sellConfig,
-  stop,
-  userConfig,
-} from './config';
+import { confPri, confPub, pair, buyConfig, sellConfig, stop } from './params';
+import userConfig from './userConfig';
 import dayjs from 'dayjs';
 import ora from 'ora';
 
