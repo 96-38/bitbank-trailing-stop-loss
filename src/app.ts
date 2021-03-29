@@ -71,17 +71,21 @@ const getOrderInfo = async (config: { order_id: number; pair: string }) => {
 
 //約定を判定して完了するまで待機 → トレーリングストップ処理を開始
 const checkOrderStatus = async (
+  timeout: number = 30,
   config: { order_id: number; pair: string },
   callback: () => Promise<void>
 ) => {
-  const spinner = ora('waiting for transaction');
-  spinner.start();
+  //タイムアウト処理に利用するカウンター
   let counter = 0;
+  const maxCount = (timeout * 1000) / 1500;
+  const spinner = ora(`waiting for transaction: timeout ${timeout} sec`);
+  spinner.start();
   const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
     counter++;
-    if (counter > 20) {
-      spinner.fail('transaction timeout : order cancelled');
+    //タイムアウト処理
+    if (counter > maxCount) {
+      spinner.fail('transaction timeout: order cancelled');
       await privateApi.cancelOrder(config);
       clearInterval(id);
     }
@@ -167,13 +171,19 @@ const checkStop = async () => {
 };
 
 const main = async () => {
-  //JPY換算で注文数量を引数に指定
+  //timeout sec (default: 30sec)
+  const timeout = 10;
+  //manual pricing (default: last price)
+  const price = 220;
+  //JPY換算で取引数量を指定
+  const amount = 100;
+
   // const before = await getAssets();
-  await setAmount(100);
-  await setPrice(220);
+  await setAmount(amount);
+  await setPrice(price);
   await setInitialStop();
   const config = await postOrder();
-  await checkOrderStatus(config, checkStop);
+  await checkOrderStatus(timeout, config, checkStop);
   // const after = await getAssets();
   // const profit = (await after) - before;
   // console.log({ profit });
