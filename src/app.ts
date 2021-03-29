@@ -1,5 +1,13 @@
 import * as bitbank from 'node-bitbankcc';
-import { confPri, confPub, pair, buyConfig, sellConfig, stop } from './config';
+import {
+  confPri,
+  confPub,
+  pair,
+  buyConfig,
+  sellConfig,
+  stop,
+  userConfig,
+} from './config';
 import dayjs from 'dayjs';
 import ora from 'ora';
 
@@ -144,19 +152,12 @@ const checkStop = async () => {
 };
 
 const main = async () => {
-  //timeout sec (default: 30sec)
-  const timeout = 10;
-  //manual pricing (default: last price)
-  const price = 220;
-  //set amount(JPY)
-  const amount = 100;
-
   // const before = await getAssets();
-  await setAmount(amount);
-  await setPrice(price);
+  await setAmount(userConfig.amount);
+  await setPrice(userConfig.price);
   await setInitialStop();
   const config = await postOrder();
-  await checkOrderStatus(timeout, config, checkStop);
+  await checkOrderStatus(userConfig.timeout, config, checkStop);
   // const after = await getAssets();
   // const profit = (await after) - before;
   // console.log({ profit });
