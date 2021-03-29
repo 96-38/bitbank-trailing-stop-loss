@@ -9,7 +9,7 @@ const publicApi = new bitbank.PublicApi(confPub);
 
 //---------- configs ----------
 // getPrice params
-const mona: bitbank.GetTickerRequest = {
+const pair: bitbank.GetTickerRequest = {
   pair: 'mona_jpy', // required
 };
 
@@ -44,7 +44,7 @@ const getAssets = async () => {
 
 //set order amount
 const setAmount = async (jpy: number) => {
-  const price = await publicApi.getTicker(mona);
+  const price = await publicApi.getTicker(pair);
   const amount = String(jpy / Number(price.data.last));
   buyConfig.amount = amount;
   sellConfig.amount = amount;
@@ -110,7 +110,7 @@ const payoff = async () => {
 
 //set order price (default: last price)
 const setPrice = async (arg?: number) => {
-  const price = await publicApi.getTicker(mona);
+  const price = await publicApi.getTicker(pair);
   buyConfig.price = arg || Number(price.data.last);
   console.log(`order price: ${buyConfig.price}`);
 };
@@ -141,7 +141,7 @@ const checkStop = async () => {
     //get order price
     const orderedPrice = buyConfig.price!;
     console.log({ orderedPrice });
-    const currentPrice = await publicApi.getTicker(mona);
+    const currentPrice = await publicApi.getTicker(pair);
     console.log({ currentPrice: Number(currentPrice.data.last) });
     //highest value from start tracking
     console.log({ highestPrice: temp });
