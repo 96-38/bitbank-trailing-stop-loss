@@ -1,5 +1,5 @@
 import * as bitbank from 'node-bitbankcc';
-import { confPri, confPub } from './config';
+import { confPri, confPub, pair, buyConfig, sellConfig, stop } from './config';
 import dayjs from 'dayjs';
 import ora from 'ora';
 
@@ -7,34 +7,6 @@ import ora from 'ora';
 const privateApi = new bitbank.PrivateApi(confPri);
 const publicApi = new bitbank.PublicApi(confPub);
 
-//---------- configs ----------
-// getPrice params
-const pair: bitbank.GetTickerRequest = {
-  pair: 'mona_jpy', // required
-};
-
-//order params
-const buyConfig: bitbank.OrderRequest = {
-  pair: 'mona_jpy', // required
-  amount: '', // required
-  price: 0, // optional
-  side: 'buy', // required
-  type: 'limit', // required
-};
-
-const sellConfig: bitbank.OrderRequest = {
-  pair: 'mona_jpy', // required
-  amount: '', // required
-  side: 'sell', // required
-  type: 'market', // required
-};
-
-//initialize stop price
-const stop = {
-  price: 0,
-};
-
-//---------- functions ----------
 //get JPY assets
 const getAssets = async () => {
   const res = await privateApi.getAssets();
