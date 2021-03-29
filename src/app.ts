@@ -93,9 +93,9 @@ const payoff = async () => {
 };
 
 // 注文価格を最終約定価格に設定
-const setPrice = async () => {
+const setPrice = async (arg?: number) => {
   const price = await publicApi.getTicker(mona);
-  buyConfig.price = Number(price.data.last);
+  buyConfig.price = arg || Number(price.data.last);
   console.log(`order price: ${buyConfig.price}`);
 };
 
