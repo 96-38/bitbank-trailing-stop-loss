@@ -77,7 +77,7 @@ const checkOrderStatus = async (
 ) => {
   //タイムアウト処理に利用するカウンター
   let counter = 0;
-  const maxCount = (timeout * 1000) / 1500;
+  const maxCount = (timeout * 1000) / 1500; // timeout(ms)/interval(ms)
   const spinner = ora(`waiting for transaction: timeout ${timeout} sec`);
   spinner.start();
   const id = await setInterval(async () => {
