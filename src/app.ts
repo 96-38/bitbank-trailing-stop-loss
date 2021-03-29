@@ -13,20 +13,10 @@ const mona: bitbank.GetTickerRequest = {
   pair: 'mona_jpy', // required
 };
 
-//set order amount
-let amount = ''; // initialize
-const setAmount = async (jpy: number) => {
-  const price = await publicApi.getTicker(mona);
-  amount = String(jpy / Number(price.data.last));
-  buyConfig.amount = amount;
-  sellConfig.amount = amount;
-  console.log(`order amount: ${buyConfig.amount}`);
-};
-
 //order params
 const buyConfig: bitbank.OrderRequest = {
   pair: 'mona_jpy', // required
-  amount: amount, // required
+  amount: '', // required
   price: 0, // optional
   side: 'buy', // required
   type: 'limit', // required
@@ -34,28 +24,37 @@ const buyConfig: bitbank.OrderRequest = {
 
 const sellConfig: bitbank.OrderRequest = {
   pair: 'mona_jpy', // required
-  amount: amount, // required
+  amount: '', // required
   side: 'sell', // required
   type: 'market', // required
 };
 
-//initialize Stop
+//initialize stop price
 const stop = {
   price: 0,
 };
 
 //---------- functions ----------
-//JPY資産を取得
+//get JPY assets
 const getAssets = async () => {
   const res = await privateApi.getAssets();
   //return JPY amount
   return Number(res.data.assets[0].onhand_amount);
 };
 
-//指値注文を発注
+//set order amount
+const setAmount = async (jpy: number) => {
+  const price = await publicApi.getTicker(mona);
+  const amount = String(jpy / Number(price.data.last));
+  buyConfig.amount = amount;
+  sellConfig.amount = amount;
+  console.log(`order amount: ${buyConfig.amount}`);
+};
+
+//post limit order (buy)
 const postOrder = async () => {
   const res = await privateApi.postOrder(buyConfig);
-  //注文情報を参照する際に必要なオブジェクトを return
+  //return order object
   const orderInfo: bitbank.GetOrderRequest = {
     order_id: res.data.order_id,
     pair: 'mona_jpy',
@@ -63,19 +62,24 @@ const postOrder = async () => {
   return orderInfo;
 };
 
-//注文情報を取得
+//get order info
 const getOrderInfo = async (config: { order_id: number; pair: string }) => {
-  const res = await privateApi.getOrder(config);
-  return res;
+  try {
+    const res = await privateApi.getOrder(config);
+    return res;
+  } catch (ignored) {
+    //do nothing
+    //errors (Error:20001, Error:50009) may occur due to the API
+  }
 };
 
-//約定を判定して完了するまで待機 → トレーリングストップ処理を開始
+//waiting for transaction -> start trailing
 const checkOrderStatus = async (
   timeout: number = 30,
   config: { order_id: number; pair: string },
   callback: () => Promise<void>
 ) => {
-  //タイムアウト処理に利用するカウンター
+  //counter for timeout
   let counter = 0;
   const maxCount = (timeout * 1000) / 1500; // timeout(ms)/interval(ms)
   const spinner = ora(`waiting for transaction: timeout ${timeout} sec`);
@@ -83,13 +87,14 @@ const checkOrderStatus = async (
   const id = await setInterval(async () => {
     const status = await getOrderInfo(config);
     counter++;
-    //タイムアウト処理
+    //timeout, cancel order
     if (counter > maxCount) {
       spinner.fail('transaction timeout: order cancelled');
       await privateApi.cancelOrder(config);
       clearInterval(id);
     }
-    if (status.data.status === 'FULLY_FILLED') {
+    //when transaction completed
+    if (status!.data.status === 'FULLY_FILLED') {
       spinner.succeed('transaction completed');
       clearInterval(id);
       await callback();
@@ -97,38 +102,34 @@ const checkOrderStatus = async (
   }, 1500);
 };
 
-//成り売り
+//post sell order (market)
 const payoff = async () => {
   const res = await privateApi.postOrder(sellConfig);
   console.log(res);
 };
 
-// 注文価格を最終約定価格に設定
+//set order price (default: last price)
 const setPrice = async (arg?: number) => {
   const price = await publicApi.getTicker(mona);
   buyConfig.price = arg || Number(price.data.last);
   console.log(`order price: ${buyConfig.price}`);
 };
 
-// 最終約定価格 * 0.98 に損切りラインを設定
+//set initial stop price
 const setInitialStop = async () => {
-  const price = await publicApi.getTicker(mona);
-  stop.price = Number(price.data.last) * 0.98;
+  stop.price = buyConfig.price! * 0.98;
   console.log(`stop price: ${stop.price}`);
 };
 
-// 一定時間毎に現在価格が損切りラインに達していないか判定
+//check if current price has reached the stop price
 const checkStop = async () => {
   let counter = 1;
   const interval = 1500;
-  //開始時刻
   const startTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
-  // 価格の状態を保存するための変数
+  //store price status
   let temp = buyConfig.price!;
-  console.log('starting trail ...');
-  // 1500ms ごとに実行
+  console.log('start trailing ...');
   const id = setInterval(async () => {
-    //現在時刻
     const currentTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
     console.log(
       `========== time: ${dayjs(currentTime).diff(
@@ -137,31 +138,31 @@ const checkStop = async () => {
       )} s ==========`
     );
     console.log({ currentTime });
-    //注文価格を取得
+    //get order price
     const orderedPrice = buyConfig.price!;
     console.log({ orderedPrice });
     const currentPrice = await publicApi.getTicker(mona);
     console.log({ currentPrice: Number(currentPrice.data.last) });
-    //追従開始から現在までの最高値
+    //highest value from start tracking
     console.log({ highestPrice: temp });
-    //変動幅算出
+    //diff from latest price
     const diff = Number(currentPrice.data.last) - temp;
     console.log({ diff });
     console.log({ stopPrice: stop.price });
-    //利益算出
+    //estimated profit
     const profit =
       Number(buyConfig.amount) * stop.price -
       Number(buyConfig.amount) * buyConfig.price!;
     console.log(`{ estimated profit: ${profit} yen}`);
     console.log();
+    //when price rises
     if (diff > 0) {
-      //現在価格が上昇した時のみ実行
       temp += diff;
       stop.price += diff;
       console.log(`set stop : ${stop.price}`);
     }
+    //when current price has reached the stop price
     if (Number(currentPrice.data.last) <= stop.price) {
-      //現在価格が損切りラインを下回った時のみ実行
       console.log('done');
       clearInterval(id);
       payoff();
@@ -175,7 +176,7 @@ const main = async () => {
   const timeout = 10;
   //manual pricing (default: last price)
   const price = 220;
-  //JPY換算で取引数量を指定
+  //set amount(JPY)
   const amount = 100;
 
   // const before = await getAssets();
