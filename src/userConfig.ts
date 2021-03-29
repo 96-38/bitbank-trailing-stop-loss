@@ -15,9 +15,10 @@ const userConfig = {
   //pair
   pair: pair.mona,
   //manual pricing (default: last price)
+  //set undefined if default value used
   price: 200, //JPY
   //order amount
-  amount: 1000, //JPY
+  amount: 100, //JPY
   //timeout sec (default: 30)
   timeout: 10, //sec
 };
