@@ -30,7 +30,7 @@ const postOrder = async () => {
   //return order object
   const orderInfo: bitbank.GetOrderRequest = {
     order_id: res.data.order_id,
-    pair: 'mona_jpy',
+    pair: userConfig.pair,
   };
   return orderInfo;
 };

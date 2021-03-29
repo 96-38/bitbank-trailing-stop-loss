@@ -1,5 +1,6 @@
 import * as bitbank from 'node-bitbankcc';
 import dotenv from 'dotenv';
+import userConfig from './userConfig';
 
 dotenv.config();
 const env = process.env;
@@ -22,12 +23,12 @@ export const confPri: bitbank.PrivateApiConfig = {
 
 // getPrice params
 export const pair: bitbank.GetTickerRequest = {
-  pair: 'mona_jpy', // required
+  pair: userConfig.pair, // required
 };
 
 //order params
 export const buyConfig: bitbank.OrderRequest = {
-  pair: 'mona_jpy', // required
+  pair: userConfig.pair, // required
   amount: '', // required
   price: 0, // optional
   side: 'buy', // required
@@ -35,7 +36,7 @@ export const buyConfig: bitbank.OrderRequest = {
 };
 
 export const sellConfig: bitbank.OrderRequest = {
-  pair: 'mona_jpy', // required
+  pair: userConfig.pair, // required
   amount: '', // required
   side: 'sell', // required
   type: 'market', // required
@@ -45,4 +46,3 @@ export const sellConfig: bitbank.OrderRequest = {
 export const stop = {
   price: 0,
 };
-
