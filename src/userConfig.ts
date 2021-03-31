@@ -25,7 +25,7 @@ const userConfig: {
   amount: 100, //required [JPY]
 
   //manual pricing (default: last price)
-  price: 220, //optional [JPY]
+  price: 226, //optional [JPY]
 
   // timeout sec (default: 30)
   timeout: 100, //optional [sec]

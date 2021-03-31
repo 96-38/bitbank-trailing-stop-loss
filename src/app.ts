@@ -125,10 +125,11 @@ const checkStop = async () => {
     // };
     logUpdate(
       `\ncurrent time: ${currentTime}
+elapsed time: ${counter} sec
       \nordered price: ${orderedPrice}
 current price: ${Number(currentPrice.data.last)}
+   stop price: ${Math.round(stop.price * 1000) / 1000}
 highest price: ${temp}
-stop price: ${Math.round(stop.price * 1000) / 1000}
       \nestimated profit: ${Math.floor(profit * 1000) / 1000} yen`
     );
     //when price rises
