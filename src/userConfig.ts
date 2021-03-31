@@ -1,5 +1,5 @@
 //available pairs
-const pair = {
+const pairs = {
   btc: 'btc_jpy',
   eth: 'eth_jpy',
   xrp: 'xrp_jpy',
@@ -11,16 +11,24 @@ const pair = {
   mona: 'mona_jpy',
 };
 
-const userConfig = {
+//comment out or delete when using the default value
+const userConfig: {
+  pair: string;
+  amount: number;
+  price?: number;
+  timeout?: number;
+} = {
   //pair
-  pair: pair.mona,
-  //manual pricing (default: last price)
-  //set undefined if default value used
-  price: 200, //JPY
+  pair: pairs.mona, //required
+
   //order amount
-  amount: 100, //JPY
-  //timeout sec (default: 30)
-  timeout: 10, //sec
+  amount: 100, //required [JPY]
+
+  //manual pricing (default: last price)
+  price: 226, //optional [JPY]
+
+  // timeout sec (default: 30)
+  timeout: 100, //optional [sec]
 };
 
 export default userConfig;

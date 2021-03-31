@@ -6,8 +6,7 @@
   "author": "<b1919367@planet.kanazawa-it.ac.jp>",
   "license": "MIT",
   "scripts": {
-    "sim": "ts-node src/simulator.ts",
-    "buy": "ts-node src/app.ts"
+    "start": "ts-node src/app.ts"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
@@ -17,6 +16,7 @@
   "dependencies": {
     "dayjs": "^1.10.4",
     "dotenv": "^8.2.0",
+    "log-update": "^4.0.0",
     "node-bitbankcc": "^2.1.2",
     "ora": "^5.4.0"
   }
