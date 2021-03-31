@@ -3,6 +3,7 @@ import { confPri, confPub, pair, buyConfig, sellConfig, stop } from './params';
 import userConfig from './userConfig';
 import dayjs from 'dayjs';
 import ora from 'ora';
+const logUpdate = require('log-update');
 
 // instance
 const privateApi = new bitbank.PrivateApi(confPri);
@@ -21,7 +22,7 @@ const setAmount = async (jpy: number) => {
   const amount = String(jpy / Number(price.data.last));
   buyConfig.amount = amount;
   sellConfig.amount = amount;
-  console.log(`order amount: ${buyConfig.amount}`);
+  console.log(`order amount: ${Math.floor(Number(amount) * 10000) / 10000}`);
 };
 
 //post limit order (buy)
@@ -55,7 +56,7 @@ const checkOrderStatus = async (
   //counter for timeout
   let counter = 0;
   const maxCount = (timeout * 1000) / 1500; // timeout(ms)/interval(ms)
-  const spinner = ora(`waiting for transaction: timeout ${timeout} sec`);
+  const spinner = ora(`waiting for transaction: timeout in ${timeout} sec`);
   spinner.start();
   const id = await setInterval(async () => {
     const status = await getOrderInfo(orderInfo);
@@ -97,46 +98,60 @@ const setInitialStop = async () => {
 //check if current price has reached the stop price
 const checkStop = async () => {
   let counter = 1;
-  const interval = 1500;
+  const interval = 1000;
   const startTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
   //store price status
   let temp = buyConfig.price!;
   console.log('start trailing ...');
   const id = setInterval(async () => {
     const currentTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
-    console.log(
-      `========== time: ${dayjs(currentTime).diff(
-        startTime,
-        'second'
-      )} s ==========`
-    );
-    console.log({ currentTime });
+    // logUpdate(
+    //   `========== time: ${dayjs(currentTime).diff(
+    //     startTime,
+    //     'second'
+    //   )} s ==========`
+    // );
+    // logUpdate({ currentTime });
     //get order price
     const orderedPrice = buyConfig.price!;
-    console.log({ orderedPrice });
+    // logUpdate({ orderedPrice });
     const currentPrice = await publicApi.getTicker(pair);
-    console.log({ currentPrice: Number(currentPrice.data.last) });
+    // logUpdate({ currentPrice: Number(currentPrice.data.last) });
     //highest value from start tracking
-    console.log({ highestPrice: temp });
+    // logUpdate({ highestPrice: temp });
     //diff from latest price
     const diff = Number(currentPrice.data.last) - temp;
-    console.log({ diff });
-    console.log({ stopPrice: stop.price });
+    // logUpdate({ diff });
+    // logUpdate({ stopPrice: stop.price });
     //estimated profit
     const profit =
       Number(buyConfig.amount) * stop.price -
       Number(buyConfig.amount) * buyConfig.price!;
-    console.log(`{ estimated profit: ${profit} yen}`);
-    console.log();
+    // const log = {
+    //   'current time': currentTime,
+    //   'ordered price': `${orderedPrice} yen`,
+    //   'current price': `${Number(currentPrice.data.last)} yen`,
+    //   'highest price': `${temp} yen`,
+    //   'stop price': `${Math.round(stop.price * 1000) / 1000} yen`,
+    //   'estimated profit': `${Math.round(profit * 1000) / 1000} yen`,
+    // };
+    logUpdate(
+      `\ncurrent time: ${currentTime}
+      \nordered price: ${orderedPrice}
+current price: ${Number(currentPrice.data.last)}
+highest price: ${temp}
+stop price: ${Math.round(stop.price * 1000) / 1000}
+      \nestimated profit: ${Math.floor(profit * 1000) / 1000} yen`
+    );
     //when price rises
     if (diff > 0) {
       temp += diff;
       stop.price += diff;
-      console.log(`set stop : ${stop.price}`);
+      // console.log(`\nset stop : ${stop.price}`);
     }
     //when current price has reached the stop price
     if (Number(currentPrice.data.last) <= stop.price) {
-      console.log('done');
+      // console.log('done');
       clearInterval(id);
       payoff();
     }

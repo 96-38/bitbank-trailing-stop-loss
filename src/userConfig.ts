@@ -22,13 +22,13 @@ const userConfig: {
   pair: pairs.mona, //required
 
   //order amount
-  amount: 100, //required [JPY]
+  amount: 10000, //required [JPY]
 
   //manual pricing (default: last price)
-  price: 200, //optional [JPY]
+  // price: 228, //optional [JPY]
 
   // timeout sec (default: 30)
-  timeout: 10, //optional [sec]
+  timeout: 10000, //optional [sec]
 };
 
 export default userConfig;
