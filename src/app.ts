@@ -101,28 +101,16 @@ const checkStop = async () => {
   const interval = 1000;
   const startTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
   //store price status
+  //highest price from start tracking
   let temp = buyConfig.price!;
   console.log('start trailing ...');
   const id = setInterval(async () => {
     const currentTime = dayjs().format('YYYY-MM-DD-HH:mm:ss');
-    // logUpdate(
-    //   `========== time: ${dayjs(currentTime).diff(
-    //     startTime,
-    //     'second'
-    //   )} s ==========`
-    // );
-    // logUpdate({ currentTime });
     //get order price
     const orderedPrice = buyConfig.price!;
-    // logUpdate({ orderedPrice });
     const currentPrice = await publicApi.getTicker(pair);
-    // logUpdate({ currentPrice: Number(currentPrice.data.last) });
-    //highest value from start tracking
-    // logUpdate({ highestPrice: temp });
     //diff from latest price
     const diff = Number(currentPrice.data.last) - temp;
-    // logUpdate({ diff });
-    // logUpdate({ stopPrice: stop.price });
     //estimated profit
     const profit =
       Number(buyConfig.amount) * stop.price -
@@ -147,11 +135,9 @@ stop price: ${Math.round(stop.price * 1000) / 1000}
     if (diff > 0) {
       temp += diff;
       stop.price += diff;
-      // console.log(`\nset stop : ${stop.price}`);
     }
     //when current price has reached the stop price
     if (Number(currentPrice.data.last) <= stop.price) {
-      // console.log('done');
       clearInterval(id);
       payoff();
     }
@@ -160,16 +146,11 @@ stop price: ${Math.round(stop.price * 1000) / 1000}
 };
 
 const main = async () => {
-  // const before = await getAssets();
   await setAmount(userConfig.amount);
   await setPrice(userConfig.price);
   await setInitialStop();
   const orderInfo = await postOrder();
   await checkOrderStatus(userConfig.timeout, orderInfo, checkStop);
-  // const after = await getAssets();
-  // const profit = (await after) - before;
-  // console.log({ profit });
-  // console.log({ before, after });
 };
 
 main();
