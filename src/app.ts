@@ -46,9 +46,9 @@ const postOrder = async () => {
 };
 
 //get order info
-const getOrderInfo = async (config: { order_id: number; pair: string }) => {
+const getOrderInfo = async (orderInfo: { order_id: number; pair: string }) => {
   try {
-    const res = await privateApi.getOrder(config);
+    const res = await privateApi.getOrder(orderInfo);
     return res;
   } catch (ignored) {
     //do nothing
