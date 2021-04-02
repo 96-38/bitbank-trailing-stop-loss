@@ -18,13 +18,13 @@ Disclaimer : May contain inaccuracies, please use it at your own risk.
 
 ### Clone the repository
 
-```
+```bash
 $ git clone https://github.com/96-38/bitbank-trailing-stop
 ```
 
 ### Install dependencies
 
-```
+```bash
 $ cd bitbank-trailing-stop
 $ yarn install # or npm install
 ```
@@ -44,7 +44,7 @@ SECRET_KEY = 'YOUR_SECRET_KEY'
 
 Edit src/userConfig.ts
 
-```
+```typescript
 //available pairs
 const pairs = {
   btc: 'btc_jpy',
@@ -93,7 +93,7 @@ If you want to use the default value, comment out the corresponding line.
 
 ### Usage
 
-```
+```bash
 $ yarn start
 ```
 
