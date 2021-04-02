@@ -147,7 +147,6 @@ elapsed time: ${counter} sec
       \nordered price: ${orderedPrice}
 current price: ${Number(currentPrice.data.last)}
    stop price: ${Math.round(stop.price * 1000) / 1000}
-highest price: ${temp}
       \nestimated profit: ${Math.floor(profit * 1000) / 1000} yen`
       );
       //when price rises
@@ -167,6 +166,7 @@ highest price: ${temp}
 
 const main = async () => {
   try {
+    console.log(`pair: ${userConfig.pair}`);
     await setAmount(userConfig.amount);
     await setPrice(userConfig.price);
     await setInitialStop();
