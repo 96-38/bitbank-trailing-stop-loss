@@ -19,16 +19,16 @@ const userConfig: {
   timeout?: number;
 } = {
   //pair
-  pair: pairs.mona, //required
+  pair: pairs.btc, //required
 
   //order amount
-  amount: 100, //required [JPY]
+  amount: 1000, //required [JPY]
 
   //manual pricing (default: last price)
-  price: 226, //optional [JPY]
+  price: 0, //optional [JPY]
 
-  // timeout sec (default: 30)
-  timeout: 100, //optional [sec]
+  //timeout (default: 30)
+  timeout: 60, //optional [sec]
 };
 
 export default userConfig;
