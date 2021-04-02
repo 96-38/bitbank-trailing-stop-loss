@@ -45,6 +45,7 @@ SECRET_KEY = 'YOUR_SECRET_KEY'
 ## Configure Order Information
 
 Edit src/userConfig.ts
+- Example
 
 ```typescript
 //available pairs
@@ -81,8 +82,6 @@ const userConfig: {
 
 export default userConfig;
 ```
-
-### Note
 
 - pair : Please select from available pairs
 - amount : Please set the value in Japanese yen equivalent.
