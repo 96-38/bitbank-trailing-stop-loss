@@ -149,7 +149,7 @@ current price: ${Number(currentPrice.data.last)}
    stop price: ${Math.round(stop.price * 1000) / 1000}
       \nestimated profit: ${Math.floor(profit * 1000) / 1000} yen`
       );
-      //when price rises
+      //when price increases
       if (diff > 0) {
         temp += diff;
         stop.price += diff;
