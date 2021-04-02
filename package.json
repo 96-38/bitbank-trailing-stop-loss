@@ -3,7 +3,7 @@
   "description": "CLI tool for using trailing stop orders on bitbank",
   "version": "0.1.0",
   "main": "dist/app.js",
-  "repository": "https://git@github.com/96-38/bitbank-api.git",
+  "repository": "https://git@github.com/96-38/bitbank-trailing-stop.git",
   "author": "Akinori Kurosawa <b1919367@planet.kanazawa-it.ac.jp>",
   "license": "MIT",
   "scripts": {
