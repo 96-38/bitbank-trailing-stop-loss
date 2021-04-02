@@ -22,10 +22,10 @@ const userConfig: {
   pair: pairs.btc, //required
 
   //order amount
-  amount: 1000, //required [JPY]
+  amount: 10000, //required [JPY]
 
   //manual pricing (default: last price)
-  price: 0, //optional [JPY]
+  price: 5000000, //optional [JPY]
 
   //timeout (default: 30)
   timeout: 60, //optional [sec]
