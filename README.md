@@ -4,7 +4,9 @@
 Provides a dynamic stop-loss that automatically adjusts as the price increases.
 </p>
 <p align="center">
+  <a href="https://github.com/96-38/bitbank-trailing-stop/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" />
+  </a>
 </p>
 <b>
 Disclaimer : May contain inaccuracies, please use it at your own risk.
