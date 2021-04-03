@@ -110,7 +110,7 @@ Submit the order according to the settings and set the initial stop-loss at {use
 
 If the transaction is completed within the time specified in the timeout, the trailing stop process will be initiated. (If the transaction is not completed in time, the order is cancelled.)
 
-As the price goes higher, the stop-loss will get dragged with it.Once the price crosses the stop-loss price, a sell order is executed.
+As the price goes higher, the stop-loss will get dragged with it by the same amount.Once the price crosses the stop-loss price, a sell order is executed.
 
 ### Important note
 
