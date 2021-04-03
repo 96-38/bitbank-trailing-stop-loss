@@ -45,6 +45,7 @@ SECRET_KEY = 'YOUR_SECRET_KEY'
 ## Configure Order Information
 
 Edit src/userConfig.ts
+
 - Example
 
 ```typescript
@@ -71,10 +72,13 @@ const userConfig: {
   pair: pairs.btc, //required
 
   //order amount
-  amount: 10000, //required [JPY]
+  orderAmount: 10000, //required [JPY]
 
   //manual pricing (default: last price)
-  price: 5000000, //optional [JPY]
+  orderPrice: 5000000, //optional [JPY]
+
+  //deviation ratio between stop loss price and order price (default: 5)
+  percentage: 3, // optional [%]
 
   //timeout (default: 30)
   timeout: 60, //optional [sec]
@@ -83,10 +87,11 @@ const userConfig: {
 export default userConfig;
 ```
 
-- pair : Please select from available pairs
-- amount : Please set the value in Japanese yen equivalent.
-- price : Please set the order price in Japanese yen. (by default, last transaction price.)
-- timeout : Please set time to wait for the transaction to be completed (by default, 30 seconds)
+- pair : Select from available pairs.
+- orderAmount : Please set the value in Japanese yen equivalent.
+- orderPrice : Set the order price in Japanese yen. (by default, last transaction price.)
+- percentage : Specify how far below the order price the stop loss price should be set as a percentage. (by default, 5 %)
+- timeout : Set time to wait for the transaction to be completed (by default, 30 seconds)
 
 If you want to use the default value, comment out the corresponding line.
 
@@ -100,7 +105,7 @@ $ yarn start
 
 ## How it works
 
-Submit the order according to the settings and set the initial stop-loss at 2% below the order price. (I will likely add an option later to specify stop-loss price.)
+Submit the order according to the settings and set the initial stop-loss at {userConfig.percentage} % below the order price.
 
 If the transaction is completed within the time specified in the timeout, the trailing stop process will be initiated. (If the transaction is not completed in time, the order is cancelled.)
 
