@@ -25,7 +25,11 @@ const setAmount = async (jpy: number) => {
     const amount = String(jpy / Number(price.data.last));
     buyConfig.amount = amount;
     sellConfig.amount = amount;
-    console.log(`order amount: ${Math.floor(Number(amount) * 10000) / 10000}`);
+    console.log(
+      `order amount: ${Math.floor(Number(amount) * 10000) / 10000} ${
+        userConfig.pair.split('_')[0]
+      }`
+    );
   } catch (ignored) {
     //do nothing
     //timeout error may occur due to axios
@@ -100,7 +104,7 @@ const setPrice = async (arg?: number) => {
   try {
     const price = await publicApi.getTicker(pair);
     buyConfig.price = arg || Number(price.data.last);
-    console.log(`order price: ${buyConfig.price}`);
+    console.log(`order price: ${buyConfig.price} yen`);
   } catch (ignored) {}
 };
 
@@ -108,7 +112,7 @@ const setPrice = async (arg?: number) => {
 const setInitialStop = async () => {
   try {
     stop.price = buyConfig.price! * 0.98;
-    console.log(`stop price: ${stop.price}`);
+    console.log(`stop price: ${stop.price} yen`);
   } catch (ignored) {}
 };
 
