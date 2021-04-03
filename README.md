@@ -64,8 +64,9 @@ const pairs = {
 
 const userConfig: {
   pair: string;
-  amount: number;
-  price?: number;
+  orderAmount: number;
+  orderPrice?: number;
+  percentage?: number;
   timeout?: number;
 } = {
   //pair
