@@ -164,8 +164,8 @@ current price: ${Number(currentPrice.data.last)}
 const main = async () => {
   try {
     console.log(`pair: ${userConfig.pair}`);
-    await setAmount(userConfig.amount);
-    await setPrice(userConfig.price);
+    await setAmount(userConfig.orderAmount);
+    await setPrice(userConfig.orderPrice);
     await setInitialStop(userConfig.percentage);
     const orderInfo = await postOrder();
     await checkOrderStatus(userConfig.timeout, orderInfo!, checkStop);

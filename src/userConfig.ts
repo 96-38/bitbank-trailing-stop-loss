@@ -14,22 +14,22 @@ const pairs = {
 //comment out or delete when using the default value
 const userConfig: {
   pair: string;
-  amount: number;
+  orderAmount: number;
+  orderPrice?: number;
   percentage?: number;
-  price?: number;
   timeout?: number;
 } = {
   //pair
   pair: pairs.btc, //required
 
   //order amount
-  amount: 10000, //required [JPY]
+  orderAmount: 10000, //required [JPY]
+
+  //manual pricing (default: last price)
+  orderPrice: 5000000, //optional [JPY]
 
   //deviation ratio between stop loss price and order price (default: 5)
   percentage: 3, // optional [%]
-
-  //manual pricing (default: last price)
-  price: 5000000, //optional [JPY]
 
   //timeout (default: 30)
   timeout: 60, //optional [sec]
