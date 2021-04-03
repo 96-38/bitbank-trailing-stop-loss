@@ -36,6 +36,23 @@ const setAmount = async (jpy: number) => {
   }
 };
 
+//set order price (default: last price)
+const setPrice = async (price?: number) => {
+  try {
+    const currentPrice = await publicApi.getTicker(pair);
+    buyConfig.price = price || Number(currentPrice.data.last);
+    console.log(`order price: ${buyConfig.price} yen`);
+  } catch (ignored) {}
+};
+
+//set initial stop price
+const setInitialStop = async (percentage: number = 5) => {
+  try {
+    stop.price = (buyConfig.price! * (100 - percentage)) / 100;
+    console.log(`stop price: ${Math.round(stop.price * 1000) / 1000} yen`);
+  } catch (ignored) {}
+};
+
 //post limit order (buy)
 const postOrder = async () => {
   try {
@@ -99,23 +116,6 @@ const payoff = async () => {
   } catch (ignored) {}
 };
 
-//set order price (default: last price)
-const setPrice = async (arg?: number) => {
-  try {
-    const price = await publicApi.getTicker(pair);
-    buyConfig.price = arg || Number(price.data.last);
-    console.log(`order price: ${buyConfig.price} yen`);
-  } catch (ignored) {}
-};
-
-//set initial stop price
-const setInitialStop = async () => {
-  try {
-    stop.price = buyConfig.price! * 0.98;
-    console.log(`stop price: ${stop.price} yen`);
-  } catch (ignored) {}
-};
-
 //check if current price has reached the stop price
 const checkStop = async () => {
   try {
@@ -137,14 +137,7 @@ const checkStop = async () => {
       const profit =
         Number(buyConfig.amount) * stop.price -
         Number(buyConfig.amount) * buyConfig.price!;
-      // const log = {
-      //   'current time': currentTime,
-      //   'ordered price': `${orderedPrice} yen`,
-      //   'current price': `${Number(currentPrice.data.last)} yen`,
-      //   'highest price': `${temp} yen`,
-      //   'stop price': `${Math.round(stop.price * 1000) / 1000} yen`,
-      //   'estimated profit': `${Math.round(profit * 1000) / 1000} yen`,
-      // };
+      //display log
       logUpdate(
         `\ncurrent time: ${currentTime}
 elapsed time: ${counter} sec
@@ -173,7 +166,7 @@ const main = async () => {
     console.log(`pair: ${userConfig.pair}`);
     await setAmount(userConfig.amount);
     await setPrice(userConfig.price);
-    await setInitialStop();
+    await setInitialStop(userConfig.percentage);
     const orderInfo = await postOrder();
     await checkOrderStatus(userConfig.timeout, orderInfo!, checkStop);
   } catch (ignored) {}

@@ -15,6 +15,7 @@ const pairs = {
 const userConfig: {
   pair: string;
   amount: number;
+  percentage?: number;
   price?: number;
   timeout?: number;
 } = {
@@ -23,6 +24,9 @@ const userConfig: {
 
   //order amount
   amount: 10000, //required [JPY]
+
+  //deviation ratio between stop loss price and order price (default: 5)
+  percentage: 3, // optional [%]
 
   //manual pricing (default: last price)
   price: 5000000, //optional [JPY]
