@@ -92,8 +92,13 @@ const userConfig: {
 export default userConfig;
 ```
 
+### required
+
 - pair : Select from available pairs.
 - orderAmount : Please set the value in Japanese yen equivalent.
+
+### optional
+
 - orderPrice : Set the order price in Japanese yen. (by default, last transaction price.)
 - stopPrice : Set initial stop price in Japanese yen.(If stopPrice is not set, stopPriceRatio is used by default.)
 - stopPriceRatio: Specify how far below the order price the stop loss price should be set as a percentage. If stopPrice is set, this value will be ignored. (by default, 3 %)
