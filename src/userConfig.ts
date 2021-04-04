@@ -16,7 +16,8 @@ const userConfig: {
   pair: string;
   orderAmount: number;
   orderPrice?: number;
-  percentage?: number;
+  stopPrice?: number;
+  stopPriceRatio?: number;
   timeout?: number;
 } = {
   //pair
@@ -25,11 +26,14 @@ const userConfig: {
   //order amount
   orderAmount: 10000, //required [JPY]
 
-  //manual pricing (default: last price)
+  //order price (default: last price)
   orderPrice: 5000000, //optional [JPY]
 
-  //deviation ratio between stop loss price and order price (default: 5)
-  percentage: 3, // optional [%]
+  //stop price (If stopPrice is not set, stopPriceRatio is used by default.)
+  stopPrice: 4900000, //optional [JPY]
+
+  //deviation ratio between stop loss price and order price. If stopPrice is set, this value will be ignored. (default: 3)
+  stopPriceRatio: 2, // optional [%]
 
   //timeout (default: 30)
   timeout: 60, //optional [sec]

@@ -66,7 +66,8 @@ const userConfig: {
   pair: string;
   orderAmount: number;
   orderPrice?: number;
-  percentage?: number;
+  stopPrice?: number;
+  stopPriceRatio?: number;
   timeout?: number;
 } = {
   //pair
@@ -75,11 +76,14 @@ const userConfig: {
   //order amount
   orderAmount: 10000, //required [JPY]
 
-  //manual pricing (default: last price)
+  //order price (default: last transaction price)
   orderPrice: 5000000, //optional [JPY]
 
-  //deviation ratio between stop loss price and order price (default: 5)
-  percentage: 3, // optional [%]
+  //stop price (If stopPrice is not set, stopPriceRatio is used by default.)
+  stopPrice: 4900000, //optional [JPY]
+
+  //deviation ratio between stop loss price and order price (default: 3)
+  stopPriceRatio: 2, //optional [%]
 
   //timeout (default: 30)
   timeout: 60, //optional [sec]
@@ -91,7 +95,8 @@ export default userConfig;
 - pair : Select from available pairs.
 - orderAmount : Please set the value in Japanese yen equivalent.
 - orderPrice : Set the order price in Japanese yen. (by default, last transaction price.)
-- percentage : Specify how far below the order price the stop loss price should be set as a percentage. (by default, 5 %)
+- stopPrice : Set initial stop price in Japanese yen.(If stopPrice is not set, stopPriceRatio is used by default.)
+- stopPriceRatio: Specify how far below the order price the stop loss price should be set as a percentage. If stopPrice is set, this value will be ignored. (by default, 3 %)
 - timeout : Set time to wait for the transaction to be completed (by default, 30 seconds)
 
 If you want to use the default value, comment out the corresponding line.
@@ -106,7 +111,7 @@ $ yarn start
 
 ## How it works
 
-Submit the order according to the settings and set the initial stop-loss at {userConfig.percentage} % below the order price.
+Submit the order according to the settings and set the initial stop-loss at {userConfig.stopPrice} yen. (or {userConfig.stopPriceRatio} % below the order price.)
 
 If the transaction is completed within the time specified in the timeout, the trailing stop process will be initiated. (If the transaction is not completed in time, the order is cancelled.)
 

@@ -46,9 +46,9 @@ const setPrice = async (price?: number) => {
 };
 
 //set initial stop price
-const setInitialStop = async (percentage: number = 5) => {
+const setInitialStop = async (stopPriceRatio: number = 3) => {
   try {
-    stop.price = (buyConfig.price! * (100 - percentage)) / 100;
+    stop.price = userConfig.stopPrice || (buyConfig.price! * (100 - stopPriceRatio)) / 100;
     console.log(`stop price: ${Math.round(stop.price * 1000) / 1000} yen`);
   } catch (ignored) {}
 };
@@ -166,7 +166,7 @@ const main = async () => {
     console.log(`pair: ${userConfig.pair}`);
     await setAmount(userConfig.orderAmount);
     await setPrice(userConfig.orderPrice);
-    await setInitialStop(userConfig.percentage);
+    await setInitialStop(userConfig.stopPriceRatio);
     const orderInfo = await postOrder();
     await checkOrderStatus(userConfig.timeout, orderInfo!, checkStop);
   } catch (ignored) {}
