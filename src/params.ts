@@ -8,8 +8,8 @@ const env = process.env;
 //for public api
 export const confPub: bitbank.ApiConfig = {
   endPoint: 'https://public.bitbank.cc', // required
-  keepAlive: false, // optional, default false
-  timeout: 3000, // optional, default 3000
+  keepAlive: true, // optional, default false
+  timeout: 10000, // optional, default 3000
 };
 
 //for private api
@@ -17,8 +17,8 @@ export const confPri: bitbank.PrivateApiConfig = {
   endPoint: 'https://api.bitbank.cc/v1', // required
   apiKey: env.API_KEY!, // required
   apiSecret: env.SECRET_KEY!, // required
-  keepAlive: false, // optional, default->false
-  timeout: 3000, // optional, default->3000
+  keepAlive: true, // optional, default false
+  timeout: 10000, // optional, default 3000
 };
 
 // getPrice params
